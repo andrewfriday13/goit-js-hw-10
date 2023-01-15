@@ -516,16 +516,20 @@ const cardCountry = document.querySelector(".card-country");
 const DEBOUNCE_DELAY = 300;
 input.addEventListener("input", (0, _lodashDebounceDefault.default)(searchCountry, DEBOUNCE_DELAY));
 function searchCountry() {
-    const nameCountry = input.value;
-    (0, _fetchCountries.fetchCountries)(nameCountry).then((data)=>{
-        if (data.length > 10) return (0, _notiflixDefault.default).Notify.info("\u0414\u0430\u0439 \u0431\u0456\u043B\u044C\u0448\u0435 \u0431\u0443\u043A\u0432");
-        createCards(data);
-        if (data.length == 1) return countryCard(data);
-        data.length = 0;
-    }).catch((error)=>(0, _notiflixDefault.default).Notify.failure("\u043D\u0435 \u043F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u0456 \u0431\u0443\u043A\u0432\u0438"));
+    const nameCountry = input.value.trim();
+    if (nameCountry === "") {
+        countryList.innerHTML = "";
+        return;
+    }
+    (0, _fetchCountries.fetchCountries)(nameCountry).then(getSuccess).catch(removeCountry);
+}
+function getSuccess(data) {
+    if (data.length > 10) return (0, _notiflixDefault.default).Notify.info("\u0414\u0430\u0439 \u0431\u0456\u043B\u044C\u0448\u0435 \u0431\u0443\u043A\u0432");
+    createCards(data);
+    if (data.length == 1) return countryCard(data);
 }
 function createCards(arr) {
-    const make = arr.map(({ name , capital , population , flags , languages  })=>`    <li class="card-country" style="display: flex; align-items: center">
+    const make = arr.map(({ name , flags  })=>`    <li class="card-country" style="display: flex; align-items: center">
     <img src="${flags.svg}" alt="" width="50" height="30">
     <h2>${name.official}</h2>
   </li>
@@ -544,6 +548,11 @@ function countryCard(arr) {
   `).join("");
     countryList.innerHTML = make;
     countryList.style.padding = "0";
+}
+function removeCountry() {
+    countryList.innerHTML = "";
+    countryCard.innerHTML = "";
+    (0, _notiflixDefault.default).Notify.failure("\u043D\u0435 \u043F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u0456 \u0431\u0443\u043A\u0432\u0438");
 }
 
 },{"./css/styles.css":"1CY4s","./fetchCountries":"fTQqv","lodash.debounce":"3JP5n","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","notiflix":"5z0Oc"}],"1CY4s":[function() {},{}],"fTQqv":[function(require,module,exports) {
